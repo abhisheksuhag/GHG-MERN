@@ -1,19 +1,14 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import MainLayout from '../../layouts/MainLayout';
 
-const BasicQuestions = () => {
+function QuestionsPage() {
   const [questions, setQuestions] = useState([]);
   const [answers, setAnswers] = useState({});
 
   useEffect(() => {
     const fetchQuestions = async () => {
-      try {
-        const response = await axios.get('/api/questions');
-        setQuestions(response.data.filter(q => q.type === 'basic'));
-      } catch (error) {
-        console.error('Error fetching questions:', error);
-      }
+      const response = await axios.get('http://localhost:5000/api/questions');
+      setQuestions(response.data);
     };
 
     fetchQuestions();
@@ -26,31 +21,36 @@ const BasicQuestions = () => {
     });
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log('Submitted Answers:', answers);
-    // Here you would send the answers to your backend
+  const handleSubmit = async () => {
+    try {
+      const response = await axios.post('http://localhost:5000/api/submit-answers', { answers });
+      alert(response.data.message);
+    } catch (error) {
+      console.error('Error submitting answers:', error);
+    }
   };
 
   return (
-    <MainLayout>
-      <h1>Basic Questions</h1>
-      <form onSubmit={handleSubmit}>
+    <div>
+      <h1>Questions</h1>
+      <form>
         {questions.map((q) => (
           <div key={q._id}>
             <label>{q.text}</label>
             <input
-              type={q.fieldType}
+              type="text"
               name={q._id}
               value={answers[q._id] || ''}
               onChange={handleChange}
             />
           </div>
         ))}
-        <button type="submit">Submit</button>
+        <button type="button" onClick={handleSubmit}>
+          Submit
+        </button>
       </form>
-    </MainLayout>
+    </div>
   );
-};
+}
 
-export default BasicQuestions;
+export default QuestionsPage;

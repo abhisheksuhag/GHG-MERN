@@ -1,12 +1,16 @@
 
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import QuestionsPage from './pages/dynamic/QuestionsPage';
+
 function App() {
-
-
   return (
-    <>
-      <h1> This is the basic frontend.</h1>
-    </>
-  )
+    <Router>
+      <Routes>
+        <Route path="/questions" element={<QuestionsPage />} />
+        {/* Add other routes here */}
+      </Routes>
+    </Router>
+  );
 }
 
-export default App
+export default App;
