@@ -77,28 +77,39 @@ function QuestionsPage() {
       <form onSubmit={handleSubmit}>
         {questions.map((question) => (
           <div key={question._id}>
-            <label>{question.questionText}</label>
+            <label htmlFor={question._id}>{question.questionText}</label>
+
             {question.type === 'text' && (
               <input
                 type="text"
                 name={question._id}
+                id={question._id}
                 onChange={(e) => handleChange(e, question._id)}
                 required={question.required}
+                placeholder={`Enter ${question.questionText.toLowerCase()}`} // Adding a placeholder for text inputs
+                title={question.questionText} // Adding title attribute for accessibility
               />
             )}
+
             {question.type === 'number' && (
               <input
                 type="number"
                 name={question._id}
+                id={question._id}
                 onChange={(e) => handleChange(e, question._id)}
                 required={question.required}
+                placeholder={`Enter ${question.questionText.toLowerCase()}`} // Adding a placeholder for number inputs
+                title={question.questionText} // Adding title attribute for accessibility
               />
             )}
+
             {question.type === 'dropdown' && question.options && (
               <select
                 name={question._id}
+                id={question._id}
                 onChange={(e) => handleChange(e, question._id)}
                 required={question.required}
+                title={question.questionText} // Adding title attribute for accessibility
               >
                 <option value="">Select an option</option>
                 {question.options.map((option, idx) => (
