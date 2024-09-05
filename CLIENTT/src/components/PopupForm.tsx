@@ -1,6 +1,7 @@
 // CLIENT/src/components/PopupForm.tsx
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { generateSourceId } from '../utils/helpers'; // Import the helper function
 
 interface PopupFormProps {
   onSubmit: (formData: any) => void;
@@ -9,6 +10,7 @@ interface PopupFormProps {
 
 const PopupForm = ({ onSubmit, onClose }: PopupFormProps) => {
   const [site, setSite] = useState('');
+  const [sourceId, setSourceId] = useState(''); // State for auto-generated source ID
   const [sourceDescription, setSourceDescription] = useState('');
   const [area, setArea] = useState<number | ''>('');
   const [fuelType, setFuelType] = useState('');
@@ -20,9 +22,17 @@ const PopupForm = ({ onSubmit, onClose }: PopupFormProps) => {
   const fuelStateOptions = ['Solid', 'Liquid', 'Gas'];
   const unitOptions = ['MMBtu', 'Gallons'];
 
+  // Automatically generate the sourceId based on the site input
+  useEffect(() => {
+    if (site) {
+      setSourceId(generateSourceId(site));
+    }
+  }, [site]);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const formData = {
+      sourceId, // Include the generated source ID
       site,
       sourceDescription,
       area,
@@ -31,12 +41,12 @@ const PopupForm = ({ onSubmit, onClose }: PopupFormProps) => {
       quantity,
       unit,
     };
-    onSubmit(formData);
+    onSubmit(formData); // Send the data back to the parent component
   };
 
   return (
     <div className="fixed inset-0 flex justify-center items-center bg-black bg-opacity-50">
-      <div className="bg-white p-8 rounded">
+      <div className="bg-white p-8 rounded max-h-[90%] overflow-y-auto w-full max-w-lg"> {/* Limit the height and allow scrolling */}
         <h2 className="text-xl font-bold mb-4">Stationary Source Fuel Combustion</h2>
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
@@ -49,6 +59,17 @@ const PopupForm = ({ onSubmit, onClose }: PopupFormProps) => {
               className="border p-2 w-full"
             />
           </div>
+
+          <div className="mb-4">
+            <label>Source ID (Auto-generated):</label>
+            <input
+              type="text"
+              value={sourceId}
+              disabled
+              className="border p-2 w-full bg-gray-200"
+            />
+          </div>
+
           <div className="mb-4">
             <label>Source Description:</label>
             <input
@@ -59,6 +80,7 @@ const PopupForm = ({ onSubmit, onClose }: PopupFormProps) => {
               className="border p-2 w-full"
             />
           </div>
+
           <div className="mb-4">
             <label>Source Area (sq ft):</label>
             <input
@@ -69,6 +91,7 @@ const PopupForm = ({ onSubmit, onClose }: PopupFormProps) => {
               className="border p-2 w-full"
             />
           </div>
+
           <div className="mb-4">
             <label>Fuel Type:</label>
             <select
@@ -85,6 +108,7 @@ const PopupForm = ({ onSubmit, onClose }: PopupFormProps) => {
               ))}
             </select>
           </div>
+
           <div className="mb-4">
             <label>Fuel State:</label>
             <select
@@ -101,6 +125,7 @@ const PopupForm = ({ onSubmit, onClose }: PopupFormProps) => {
               ))}
             </select>
           </div>
+
           <div className="mb-4">
             <label>Quantity Combusted:</label>
             <input
@@ -111,6 +136,7 @@ const PopupForm = ({ onSubmit, onClose }: PopupFormProps) => {
               className="border p-2 w-full"
             />
           </div>
+
           <div className="mb-4">
             <label>Units:</label>
             <select
@@ -127,6 +153,7 @@ const PopupForm = ({ onSubmit, onClose }: PopupFormProps) => {
               ))}
             </select>
           </div>
+
           <div className="flex justify-end">
             <button type="button" onClick={onClose} className="bg-red-500 text-white px-4 py-2 mr-2">
               Cancel

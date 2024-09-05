@@ -1,11 +1,13 @@
-let counter = 1;
+// CLIENT/src/utils/helpers.ts
 
-export function generateSourceId(placeName: string): string {
-  const shortForm = placeName
+let sourceCounter = 0;
+
+export const generateSourceId = (siteName: string) => {
+  sourceCounter += 1; // Increment the counter for each new site
+  const shortForm = siteName
     .split(' ')
-    .map((word) => word[0].toUpperCase())
+    .map((word) => word.charAt(0).toUpperCase())
     .join('');
-  const formattedId = `${shortForm}-${String(counter).padStart(2, '0')}`;
-  counter++;
+  const formattedId = `${shortForm}-${sourceCounter.toString().padStart(2, '0')}`;
   return formattedId;
-}
+};
