@@ -55,7 +55,7 @@ const Table = ({ data, columns, onDelete, onEdit, isEditingMode }: TableProps) =
   return (
     <div className="overflow-x-auto">
       <table className="min-w-full bg-white shadow-md rounded-lg mt-4">
-        <thead className="bg-gray-800 text-white">
+        <thead className="bg-[#01b0f1] text-white">
           <tr>
             {columns.map((col) => (
               <th key={col.key} className="text-left py-3 px-4">{col.label}</th>
@@ -73,13 +73,13 @@ const Table = ({ data, columns, onDelete, onEdit, isEditingMode }: TableProps) =
                 <td className="py-3 px-4">
                   <button
                     onClick={() => onEdit(index)}
-                    className="bg-blue-500 text-white px-3 py-1 mr-2 rounded"
+                    className="bg-[#01b0f1] text-white px-3 py-1 mr-2 rounded"
                   >
                     Edit
                   </button>
                   <button
                     onClick={() => onDelete(index)}
-                    className="bg-red-500 text-white px-3 py-1 rounded"
+                    className="bg-red-400 text-white px-3 py-1 rounded"
                   >
                     Delete
                   </button>

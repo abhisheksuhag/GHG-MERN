@@ -16,7 +16,7 @@ const Sidebar = () => {
   ];
 
   return (
-    <div className="bg-gray-800 text-white w-64 p-4">
+    <div className="bg-[#01b0f1] text-white w-64 p-4">
       <h1 className="text-lg font-bold mb-6">Emissions Categories</h1>
       <ul>
         {categories.map((category) => (

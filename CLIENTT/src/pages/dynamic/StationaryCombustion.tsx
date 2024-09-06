@@ -11,7 +11,6 @@ const StationaryCombustion = () => {
   const [isEditingMode, setIsEditingMode] = useState(false); // To toggle edit mode
 
   const fields = [
-    { label: 'Source ID', type: 'text', key: 'sourceId' },
     { label: 'Site Name', type: 'text', key: 'site' },
     { label: 'Source Description', type: 'text', key: 'sourceDescription' },
     { label: 'Source Area (sq ft)', type: 'number', key: 'area' },
@@ -83,7 +82,7 @@ const StationaryCombustion = () => {
         onClick={() => setShowPopup(true)}
         className="bg-green-500 text-white px-4 py-2 mt-4"
       >
-        Add a Site
+        Add a Site and Combustion Data
       </button>
 
       {data.length > 0 && (
