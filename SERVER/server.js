@@ -1,39 +1,29 @@
+// SERVER/server.js
 const express = require('express');
-const mongoose = require('mongoose');
+const mongoose = require('mongoose');  // Import mongoose
 const cors = require('cors');
-const questionRoutes = require('./routes/questionRoutes'); // Question related routes
-const submitAnswersRoutes = require('./routes/submitAnswers'); // Submit answers route
-require('dotenv').config();
+const connectDB = require('./config/db');
+const stationaryCombustionRoutes = require('./routes/stationaryCombustion');
 
 const app = express();
-const PORT = process.env.PORT || 5000;
 
-let userIdCounter = 1; // Initialize the user ID counter
+// Connect to MongoDB using the mongoose library
+connectDB();
 
-app.use(express.json());
+// Enable CORS for cross-origin requests
 app.use(cors({
   origin: 'http://localhost:5173', // Replace with your frontend origin
+  credentials: true, // Enable cookies and credentials if needed
 }));
 
-mongoose.connect(process.env.MONGO_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-}).then(() => {
-  console.log('Connected to MongoDB');
-}).catch((error) => {
-  console.log('Error connecting to MongoDB:', error.message);
-});
+// Middleware to parse incoming JSON requests
+app.use(express.json());
 
-// Middleware to assign incremental user ID
-app.use((req, res, next) => {
-  req.userId = userIdCounter++;
-  next();
-});
+// Add routes
+app.use('/api/stationary-combustion', stationaryCombustionRoutes);
 
-// Use the question routes
-app.use('/api', questionRoutes);
-app.use('/api', submitAnswersRoutes);
+const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+  console.log(`Server running on port ${PORT}`);
 });
