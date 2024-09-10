@@ -1,5 +1,3 @@
-
-
 const mongoose = require('mongoose');
 
 const stationaryCombustionSchema = new mongoose.Schema({
@@ -7,6 +5,7 @@ const stationaryCombustionSchema = new mongoose.Schema({
   sourceId: { type: String, required: true },
   siteName: { type: String, required: true },
   sourceDescription: { type: String, required: true },
+  area: { type: Number, required: true },
   fuelType: { type: String, required: true },
   fuelState: { type: String, required: true },
   quantity: { type: Number, required: true },
