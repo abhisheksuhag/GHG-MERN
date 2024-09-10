@@ -48,6 +48,7 @@ router.post('/final-submit', async (req, res) => {
           existingEntry.unit = entry.unit;
 
           await existingEntry.save(); // Save the updated entry
+          console.log('Updated Entry:', existingEntry);
           return { success: true, updated: true };
         } else {
           // If no existing entry, create a new one
@@ -64,6 +65,7 @@ router.post('/final-submit', async (req, res) => {
           });
 
           await newEntry.save(); // Save the new entry
+          console.log('New Entry Created:', newEntry);
           return { success: true, created: true };
         }
       } catch (error) {

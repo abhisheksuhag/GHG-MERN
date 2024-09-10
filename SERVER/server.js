@@ -2,6 +2,7 @@
 const express = require('express');
 const mongoose = require('mongoose');  // Import mongoose
 const cors = require('cors');
+require('dotenv').config(); // Load environment variables from .env file
 const connectDB = require('./config/db');
 const stationaryCombustionRoutes = require('./routes/stationaryCombustion');
 
