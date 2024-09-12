@@ -201,12 +201,12 @@ const StationaryCombustion = () => {
   const [showPopup, setShowPopup] = useState(false);
   const [data, setData] = useState<any[]>([]);
   const [editIndex, setEditIndex] = useState<number | null>(null);
-  const [isEditingMode, setIsEditingMode] = useState(false); // To toggle edit mode
+  const [isEditingMode, setIsEditingMode] = useState(false);
 
   const fields = [
-    { label: 'Site Name', type: 'text', key: 'site' },
+    { label: 'Site Name', type: 'text', key: 'siteName' },
     { label: 'Source Description', type: 'text', key: 'sourceDescription' },
-    { label: 'Source Area (sq ft)', type: 'number', key: 'area' }, // Ensure area is captured in the form
+    { label: 'Source Area (sq ft)', type: 'number', key: 'area' },
     { label: 'Fuel Type', type: 'dropdown', key: 'fuelType', options: ['Diesel', 'Petrol', 'Natural Gas'] },
     { label: 'Fuel State', type: 'dropdown', key: 'fuelState', options: ['Solid', 'Liquid', 'Gas'] },
     { label: 'Quantity Combusted', type: 'number', key: 'quantity' },
@@ -215,9 +215,9 @@ const StationaryCombustion = () => {
 
   const columns = [
     { label: 'Source ID', key: 'sourceId' },
-    { label: 'Site', key: 'site' },
+    { label: 'Site Name', key: 'siteName' },
     { label: 'Source Description', key: 'sourceDescription' },
-    { label: 'Source Area (sq ft)', key: 'area' }, // Ensure area is displayed in the table
+    { label: 'Source Area (sq ft)', key: 'area' },
     { label: 'Fuel Type', key: 'fuelType' },
     { label: 'Fuel State', key: 'fuelState' },
     { label: 'Quantity', key: 'quantity' },
@@ -278,7 +278,7 @@ const StationaryCombustion = () => {
       setData(updatedData);
       setEditIndex(null);
     } else {
-      formData.sourceId = generateSourceId(formData.site);
+      formData.sourceId = generateSourceId(formData.siteName);
 
       // Add new data to the backend using POST request
       try {
@@ -315,7 +315,7 @@ const StationaryCombustion = () => {
     try {
       const response = await axios.post('http://localhost:3000/api/stationary-combustion/final-submit', {
         userId: '66dea837debad3d86c91d178', // Use the same dummy user ID
-        data,  // Send the entire dataset, including area
+        data,
       });
       console.log(response.data.message);
     } catch (error) {

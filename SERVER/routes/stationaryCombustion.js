@@ -39,7 +39,7 @@ router.post('/final-submit', async (req, res) => {
           });
 
           // Update the entry with the new data
-          existingEntry.siteName = entry.site;
+          existingEntry.siteName = entry.siteName;
           existingEntry.sourceDescription = entry.sourceDescription;
           existingEntry.area = Number(entry.area);
           existingEntry.fuelType = entry.fuelType;
@@ -55,7 +55,7 @@ router.post('/final-submit', async (req, res) => {
           const newEntry = new StationaryCombustion({
             userId: new mongoose.Types.ObjectId(userId), // Correctly convert userId to ObjectId
             sourceId: entry.sourceId,
-            siteName: entry.site,
+            siteName: entry.siteName,
             sourceDescription: entry.sourceDescription,
             area: Number(entry.area),
             fuelType: entry.fuelType,
