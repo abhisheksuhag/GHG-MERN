@@ -14,9 +14,9 @@ const stationaryCombustionSchema = new mongoose.Schema({
   history: [
     {
       updatedAt: { type: Date },
-      changes: { type: Object }, // Record of what changed
-    },
-  ],
+      changes: { type: Object } // Record of what changed
+    }
+  ]
 });
 
 module.exports = mongoose.model('StationaryCombustion', stationaryCombustionSchema);

@@ -1,31 +1,28 @@
-
-
 import { useState, useEffect } from 'react';
-import { generateSourceId } from '../utils/helpers'; // Import the helper function
 
 interface PopupFormProps {
-  fields: Array<{ label: string, type: string, key: string, options?: string[] }>;
-  formData?: any; // Optional pre-filled data for editing
+  fields: Array<{ label: string; type: string; key: string; options?: string[] }>;
+  formData?: any;
   onSubmit: (formData: any) => void;
   onClose: () => void;
+  isEditing: boolean;
 }
 
-const PopupForm = ({ fields, formData, onSubmit, onClose }: PopupFormProps) => {
+const PopupForm = ({ fields, formData, onSubmit, onClose, isEditing }: PopupFormProps) => {
   const [formState, setFormState] = useState<any>({});
 
-  // Generate the sourceId automatically
   useEffect(() => {
     if (formData) {
       setFormState(formData);
-    } else if (formState.site) {
-      setFormState((prev: any) => ({
-        ...prev,
-        sourceId: generateSourceId(formState.site),
-      }));
+    } else {
+      setFormState({});
     }
-  }, [formState.site, formData]);
+  }, [formData]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>, key: string) => {
+    if (key === 'siteName' && isEditing) {
+      return; // Prevent changing site name when editing
+    }
     setFormState({
       ...formState,
       [key]: e.target.value,
@@ -40,7 +37,7 @@ const PopupForm = ({ fields, formData, onSubmit, onClose }: PopupFormProps) => {
   return (
     <div className="fixed inset-0 flex justify-center items-center bg-black bg-opacity-50">
       <div className="bg-white p-8 rounded max-h-[90%] overflow-auto">
-        <h2 className="text-xl font-bold mb-4">ADD COMBUSTION DATA</h2>
+        <h2 className="text-xl font-bold mb-4">{isEditing ? 'EDIT COMBUSTION DATA' : 'ADD COMBUSTION DATA'}</h2>
         <form onSubmit={handleSubmit}>
           {fields.map((field) => (
             <div key={field.key} className="mb-4">
@@ -52,6 +49,7 @@ const PopupForm = ({ fields, formData, onSubmit, onClose }: PopupFormProps) => {
                   onChange={(e) => handleChange(e, field.key)}
                   required
                   className="border p-2 w-full"
+                  disabled={field.key === 'siteName' && isEditing}
                 />
               ) : field.type === 'dropdown' ? (
                 <select
@@ -70,16 +68,17 @@ const PopupForm = ({ fields, formData, onSubmit, onClose }: PopupFormProps) => {
               ) : null}
             </div>
           ))}
-          {/* Ensure sourceId is generated */}
-          <div className="mb-4">
-            <label>Source ID (Auto-generated):</label>
-            <input
-              type="text"
-              value={formState.sourceId || ''}
-              disabled
-              className="border p-2 w-full bg-gray-200"
-            />
-          </div>
+          {isEditing && (
+            <div className="mb-4">
+              <label>Source ID:</label>
+              <input
+                type="text"
+                value={formState.sourceId || ''}
+                disabled
+                className="border p-2 w-full bg-gray-200"
+              />
+            </div>
+          )}
           <div className="flex justify-end">
             <button type="button" onClick={onClose} className="bg-red-400 text-white px-4 py-2 mr-2">
               Cancel
