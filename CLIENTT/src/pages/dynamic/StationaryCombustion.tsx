@@ -9,10 +9,10 @@
 //   const [showPopup, setShowPopup] = useState(false);
 //   const [data, setData] = useState<any[]>([]);
 //   const [editIndex, setEditIndex] = useState<number | null>(null);
-//   const [isEditingMode, setIsEditingMode] = useState(false); // To toggle edit mode
+//   const [isEditingMode, setIsEditingMode] = useState(false);
 
 //   const fields = [
-//     { label: 'Site Name', type: 'text', key: 'site' },
+//     { label: 'Site Name', type: 'text', key: 'siteName' },
 //     { label: 'Source Description', type: 'text', key: 'sourceDescription' },
 //     { label: 'Source Area (sq ft)', type: 'number', key: 'area' },
 //     { label: 'Fuel Type', type: 'dropdown', key: 'fuelType', options: ['Diesel', 'Petrol', 'Natural Gas'] },
@@ -23,7 +23,7 @@
 
 //   const columns = [
 //     { label: 'Source ID', key: 'sourceId' },
-//     { label: 'Site', key: 'site' },
+//     { label: 'Site Name', key: 'siteName' },
 //     { label: 'Source Description', key: 'sourceDescription' },
 //     { label: 'Source Area (sq ft)', key: 'area' },
 //     { label: 'Fuel Type', key: 'fuelType' },
@@ -86,13 +86,13 @@
 //       setData(updatedData);
 //       setEditIndex(null);
 //     } else {
-//       formData.sourceId = generateSourceId(formData.site);
+//       formData.sourceId = generateSourceId(formData.siteName);
 
 //       // Add new data to the backend using POST request
 //       try {
 //         await axios.post('http://localhost:3000/api/stationary-combustion/add', {
 //           userId: '66dea837debad3d86c91d178', // Replace this with the actual user ID from your dummy user
-//           ...formData,  // Send form data to the backend
+//           ...formData,  // Send form data to the backend, including area
 //         });
 //         console.log('Data successfully saved to the backend.');
 //       } catch (error) {
@@ -123,7 +123,7 @@
 //     try {
 //       const response = await axios.post('http://localhost:3000/api/stationary-combustion/final-submit', {
 //         userId: '66dea837debad3d86c91d178', // Use the same dummy user ID
-//         data,  // Send the entire dataset
+//         data,
 //       });
 //       console.log(response.data.message);
 //     } catch (error) {
@@ -190,6 +190,9 @@
 // export default StationaryCombustion;
 
 
+
+
+
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import PopupForm from '../../components/PopupForm';
@@ -202,6 +205,7 @@ const StationaryCombustion = () => {
   const [data, setData] = useState<any[]>([]);
   const [editIndex, setEditIndex] = useState<number | null>(null);
   const [isEditingMode, setIsEditingMode] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const fields = [
     { label: 'Site Name', type: 'text', key: 'siteName' },
@@ -224,16 +228,16 @@ const StationaryCombustion = () => {
     { label: 'Units', key: 'unit' },
   ];
 
-  // Load data from localStorage and backend when the component mounts
   useEffect(() => {
     const fetchDataFromBackend = async () => {
       try {
         const response = await axios.get('http://localhost:3000/api/stationary-combustion/dummyUserId123');
         setData(response.data);
-        localStorage.setItem('stationaryCombustionData', JSON.stringify(response.data)); // Sync localStorage with backend data
+        localStorage.setItem('stationaryCombustionData', JSON.stringify(response.data));
         console.log('Data fetched from backend:', response.data);
       } catch (error) {
         console.error('Error fetching data from backend:', error);
+        setError('Failed to fetch data. Please try again.');
       }
     };
 
@@ -241,11 +245,10 @@ const StationaryCombustion = () => {
     if (storedData) {
       setData(JSON.parse(storedData));
     } else {
-      fetchDataFromBackend(); // Fetch from backend if no local data is found
+      fetchDataFromBackend();
     }
   }, []);
 
-  // Save data to localStorage whenever 'data' changes
   useEffect(() => {
     if (data.length > 0) {
       localStorage.setItem('stationaryCombustionData', JSON.stringify(data));
@@ -253,50 +256,42 @@ const StationaryCombustion = () => {
   }, [data]);
 
   const handleAddSite = async (formData: any) => {
-    if (editIndex !== null) {
-      const updatedData = [...data];
-      const entryToUpdate = updatedData[editIndex];
+    try {
+      if (editIndex !== null) {
+        const entryToUpdate = data[editIndex];
 
-      // Add _id for update if available
-      if (entryToUpdate._id) {
-        formData._id = entryToUpdate._id;
-      }
+        if (entryToUpdate._id) {
+          const response = await axios.put(`http://localhost:3000/api/stationary-combustion/update/${entryToUpdate._id}`, {
+            ...formData,
+            userId: '66dea837debad3d86c91d178', // Ensure userId is sent for updates too
+          });
 
-      updatedData[editIndex] = formData;
-
-      // Send a PUT request to update the backend
-      try {
-        const entryId = updatedData[editIndex]._id; // Use the _id to update
-        await axios.put(`http://localhost:3000/api/stationary-combustion/update/${entryId}`, {
-          ...formData,  // Send the edited form data
+          const updatedData = [...data];
+          updatedData[editIndex] = response.data.updatedEntry;
+          setData(updatedData);
+        } else {
+          console.error('No _id found for entry to update');
+          setError('Failed to update entry. Missing identifier.');
+        }
+      } else {
+        const response = await axios.post('http://localhost:3000/api/stationary-combustion/add', {
+          userId: '66dea837debad3d86c91d178',
+          ...formData,
         });
-        console.log('Data successfully updated in the backend.');
-      } catch (error) {
-        console.error('Error updating data in the backend:', error);
+        setData([...data, response.data.entry]);
       }
-
-      setData(updatedData);
+      setShowPopup(false);
       setEditIndex(null);
-    } else {
-      formData.sourceId = generateSourceId(formData.siteName);
-
-      // Add new data to the backend using POST request
-      try {
-        await axios.post('http://localhost:3000/api/stationary-combustion/add', {
-          userId: '66dea837debad3d86c91d178', // Replace this with the actual user ID from your dummy user
-          ...formData,  // Send form data to the backend, including area
-        });
-        console.log('Data successfully saved to the backend.');
-      } catch (error) {
-        console.error('Error saving data to the backend:', error);
-      }
-
-      setData([...data, formData]);
+      setError(null);
+    } catch (error) {
+      console.error('Error saving/updating data:', error);
+      setError('Failed to save/update data. Please try again.');
     }
-    setShowPopup(false);
   };
 
   const handleDelete = async (index: number) => {
+    // Note: Backend doesn't have a delete endpoint. If you want to implement deletion,
+    // you'll need to add it to the backend first.
     const updatedData = data.filter((_, i) => i !== index);
     setData(updatedData);
   };
@@ -310,16 +305,17 @@ const StationaryCombustion = () => {
     setIsEditingMode(!isEditingMode);
   };
 
-  // Function to submit all data to the backend (Final Submit)
   const handleFinalSubmit = async () => {
     try {
       const response = await axios.post('http://localhost:3000/api/stationary-combustion/final-submit', {
-        userId: '66dea837debad3d86c91d178', // Use the same dummy user ID
+        userId: '66dea837debad3d86c91d178',
         data,
       });
       console.log(response.data.message);
+      setError(null);
     } catch (error) {
       console.error('Error during final data submission:', error);
+      setError('Failed to submit data. Please try again.');
     }
   };
 
@@ -327,6 +323,8 @@ const StationaryCombustion = () => {
     <MainLayout>
       <h1 className="text-2xl font-bold mb-4">Stationary Combustion</h1>
       <p>Guidelines: Please add details about stationary combustion sources...</p>
+
+      {error && <div className="text-red-500 mb-4">{error}</div>}
 
       <button
         onClick={() => setShowPopup(true)}
@@ -349,10 +347,9 @@ const StationaryCombustion = () => {
             columns={columns}
             onDelete={handleDelete}
             onEdit={handleEdit}
-            isEditingMode={isEditingMode} // Only show edit/delete buttons in editing mode
+            isEditingMode={isEditingMode}
           />
 
-          {/* Final Submit Button */}
           <div className="flex justify-end mt-4">
             <button
               onClick={handleFinalSubmit}
