@@ -51,6 +51,8 @@ const app = express();
 // Connect to MongoDB
 connectDB();
 
+
+
 // Enable CORS
 app.use(cors({
   origin: 'http://localhost:5173',

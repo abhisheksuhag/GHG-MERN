@@ -27,6 +27,8 @@ export const categoryConfig = {
         },
       ],
     },
+
+
     mobileCombustion: {
       pageTitle: 'Mobile Combustion',
       sections: [
@@ -34,16 +36,27 @@ export const categoryConfig = {
           addButtonLabel: 'Add Mobile Combustion Source',
           description: 'Add details about mobile combustion sources.',
           fields: [
-            { label: 'Vehicle Name', type: 'text', key: 'vehicleName' },
-            { label: 'Fuel Type', type: 'dropdown', key: 'fuelType', options: ['Diesel', 'Petrol'] },
-            { label: 'Fuel Efficiency (mpg)', type: 'number', key: 'fuelEfficiency' },
-            { label: 'Total Distance (miles)', type: 'number', key: 'distance' },
+            { label: 'Source Description', type: 'text', key: 'sourceDescription' },  // e.g., HQ Fleet
+            { label: 'OnRoad / NonRoad', type: 'dropdown', key: 'onRoad', options: ['OnRoad', 'NonRoad'] },  // OnRoad or NonRoad
+            { label: 'Vehicle Type', type: 'text', key: 'vehicleType' },  // e.g., Passenger Cars - Gasoline
+            { label: 'Vehicle Year', type: 'number', key: 'vehicleYear' },  // e.g., 2019
+            { label: 'Fuel Usage', type: 'number', key: 'fuelUsage' },  // e.g., 500
+            { label: 'Units', type: 'dropdown', key: 'units', options: ['gal', 'liters'] },  // e.g., gal
+            { label: 'Miles Traveled', type: 'number', key: 'milesTraveled' },  // e.g., 12,400
+            { label: 'Biodiesel Percent', type: 'number', key: 'biodieselPercent' },  // e.g., 90%
+            { label: 'Ethanol Percent', type: 'number', key: 'ethanolPercent' },  // e.g., 80%
           ],
           columns: [
-            { label: 'Vehicle Name', key: 'vehicleName' },
-            { label: 'Fuel Type', key: 'fuelType' },
-            { label: 'Fuel Efficiency (mpg)', key: 'fuelEfficiency' },
-            { label: 'Total Distance (miles)', key: 'distance' },
+            { label: 'Source ID', key: 'sourceId' },
+            { label: 'Source Description', key: 'sourceDescription' },
+            { label: 'OnRoad / NonRoad', key: 'onRoad' },
+            { label: 'Vehicle Type', key: 'vehicleType' },
+            { label: 'Vehicle Year', key: 'vehicleYear' },
+            { label: 'Fuel Usage', key: 'fuelUsage' },
+            { label: 'Units', key: 'units' },
+            { label: 'Miles Traveled', key: 'milesTraveled' },
+            { label: 'Biodiesel Percent', key: 'biodieselPercent' },
+            { label: 'Ethanol Percent', key: 'ethanolPercent' },
           ],
         },
       ],
