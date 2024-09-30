@@ -20,18 +20,16 @@ const PopupForm = ({ fields, formData, onSubmit, onClose, isEditing }: PopupForm
   }, [formData]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>, key: string) => {
-    if (key === 'siteName' && isEditing) {
-      return; // Prevent changing site name when editing
-    }
     setFormState({
       ...formState,
       [key]: e.target.value,
     });
-  };
+  }
+
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit(formState);
+    onSubmit(formState); // Submitting the form data
   };
 
   return (

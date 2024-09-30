@@ -1,37 +1,7 @@
-// // SERVER/routes/generalRoutes.js
-// const express = require('express');
-// const {
-//     addData,
-//     getData,
-//     updateData,
-//     deleteData,
-//     finalSubmit
-// } = require('../controllers/generalController');
-
-// const router = express.Router();
-
-// // Add new data
-// router.post('/add', addData);
-
-// // Final submission: create new entries or update existing ones
-// router.post('/final-submit', finalSubmit);
-
-// // Get data for a user
-// router.get('/:userId', getData);
-
-// // Update existing data
-// router.put('/update/:id', updateData);
-
-// // Delete existing data
-// router.delete('/delete/:id', deleteData);
-
-// module.exports = router;
-
-
-
 const express = require('express');
 const {
-  addOrUpdateData,
+  addData,
+  updateData,
   getData,
   deleteData,
   finalSubmit,
@@ -39,16 +9,19 @@ const {
 
 const router = express.Router();
 
-// Add or update data
-router.post('/:category/add', addOrUpdateData);
+// Add new data for a category (and optionally sectionType for multi-schema)
+router.post('/:category/section/:sectionType?/add', addData);
 
-// Get data for a specific user and category
-router.get('/:category/:userId', getData);
+// Update existing data for a category (and optionally sectionType for multi-schema)
+router.put('/:category/section/:sectionType?/update/:id', updateData);
 
-// Final submission for multiple entries
-router.post('/:category/final-submit', finalSubmit);
+// Get data for a specific user and category (and optionally sectionType for multi-schema)
+router.get('/:category/section/:sectionType?/:userId', getData);
 
-// Delete data
-router.delete('/:category/delete/:id', deleteData);
+// **Final submission for multiple entries in a category (and optionally sectionType for multi-schema)**
+router.post('/:category/section/:sectionType?/final-submit', finalSubmit);
+
+// Delete data entry for a category (and optionally sectionType for multi-schema)
+router.delete('/:category/section/:sectionType?/delete/:id', deleteData);
 
 module.exports = router;

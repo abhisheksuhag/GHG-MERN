@@ -22,6 +22,7 @@
 
 
 
+
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import DynamicCategoryPage from './pages/dynamic/DynamicCategoryPage';
 import HomePage from "./pages/HomePage"; // Assuming this is your homepage component
