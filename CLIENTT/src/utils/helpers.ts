@@ -1,10 +1,9 @@
-  // CLIENT/src/utils/helpers.ts
-
+  // In helpers.ts
   let sourceCounter = 0;
 
-  export const generateSourceId = (siteName: string) => {
-    sourceCounter += 1; // Increment the counter for each new site
-    const shortForm = siteName
+  export const generateSourceId = (fieldValue: string) => {
+    sourceCounter += 1; // Increment for each new source
+    const shortForm = fieldValue
       .split(' ')
       .map((word) => word.charAt(0).toUpperCase())
       .join('');

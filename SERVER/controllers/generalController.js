@@ -1,104 +1,40 @@
-// // SERVER/controllers/generalController.js
-// const validation = require('../services/generalValidation');
-
-// exports.addData = async (req, res) => {
-//     const { category } = req.params;
-//     const { userId, ...data } = req.body;
-
-//     try {
-//         const result = await validation.validateAndSaveData(category, userId, [data]);
-//         if (result[0].success) {
-//             res.status(result[0].created ? 201 : 200).json({
-//                 message: result[0].created ? `New ${category} Data Added Successfully` : `${category} Data Updated Successfully`,
-//                 entry: result[0].entry,
-//             });
-//         } else {
-//             throw new Error(result[0].error);
-//         }
-//     } catch (error) {
-//         console.error("Error adding/updating data:", error);
-//         res.status(500).json({ message: 'Error processing data', error: error.message });
-//     }
-// };
-
-// exports.getData = async (req, res) => {
-//     const { category, userId } = req.params;
-
-//     try {
-//         const data = await validation.getDataForUser(category, userId);
-//         res.status(200).json(data);
-//     } catch (error) {
-//         console.error("Error retrieving data:", error);
-//         res.status(500).json({ message: 'Error retrieving data', error: error.message });
-//     }
-// };
-
-// exports.updateData = async (req, res) => {
-//     const { category, id } = req.params;
-//     const updateData = req.body;
-
-//     try {
-//         const updatedEntry = await validation.updateEntry(category, id, updateData);
-//         res.status(200).json({
-//             message: 'Data updated successfully',
-//             updatedEntry,
-//         });
-//     } catch (error) {
-//         console.error("Error updating data:", error);
-//         res.status(500).json({ message: 'Error updating data', error: error.message });
-//     }
-// };
-
-// exports.deleteData = async (req, res) => {
-//     const { category, id } = req.params;
-
-//     try {
-//         await validation.deleteEntry(category, id);
-//         res.status(200).json({
-//             message: 'Data deleted successfully',
-//         });
-//     } catch (error) {
-//         console.error("Error deleting data:", error);
-//         res.status(500).json({ message: 'Error deleting data', error: error.message });
-//     }
-// };
-
-// exports.finalSubmit = async (req, res) => {
-//     const { category } = req.params;
-//     const { userId, data } = req.body;
-
-//     try {
-//         const results = await validation.validateAndSaveData(category, userId, data);
-//         const successCount = results.filter((result) => result.success).length;
-//         const failureCount = results.length - successCount;
-
-//         res.status(200).json({
-//             message: `Final submit successful. ${successCount} entries saved, ${failureCount} failures.`,
-//         });
-//     } catch (error) {
-//         console.error('Error during final submit:', error);
-//         res.status(500).json({ message: 'Error during final submit', error: error.message });
-//     }
-// };
-
-
-
 const validation = require('../services/generalValidation');
+const categoryConfig = require('../config/categoryConfig');
 
-// Add or update data for a specific category
-exports.addOrUpdateData = async (req, res) => {
-  const { category } = req.params;
+// Add new data for a specific category and section type (if applicable)
+exports.addData = async (req, res) => {
+  const { category, sectionType } = req.params;
   const { userId, ...data } = req.body;
 
   try {
-    const result = await validation.validateAndSaveData(userId, category, [data]);
-    if (result[0].success) {
-      res.status(result[0].created ? 201 : 200).json({
-        message: result[0].created ? 'Data added successfully' : 'Data updated successfully',
-        entry: result[0].entry,
+    const result = await validation.createNewData(userId, category, data, sectionType);
+    if (result.success) {
+      res.status(201).json({
+        message: 'Data added successfully',
+        entry: result.entry,
       });
     } else {
-      throw new Error(result[0].error);
+      throw new Error(result.error);
+    }
+  } catch (error) {
+    res.status(500).json({ message: 'Error processing data', error: error.message });
+  }
+};
+
+// Update existing data for a specific category and section type (if applicable)
+exports.updateData = async (req, res) => {
+  const { category, id, sectionType } = req.params;
+  const updateData = req.body;
+
+  try {
+    const result = await validation.updateExistingData(id, category, updateData, sectionType);
+    if (result.success) {
+      res.status(200).json({
+        message: 'Data updated successfully',
+        entry: result.entry,
+      });
+    } else {
+      throw new Error(result.error);
     }
   } catch (error) {
     res.status(500).json({ message: 'Error processing data', error: error.message });
@@ -107,45 +43,55 @@ exports.addOrUpdateData = async (req, res) => {
 
 // Get data for a specific user and category
 exports.getData = async (req, res) => {
-  const { category, userId } = req.params;
+  const { userId, category, sectionType } = req.params;
 
   try {
-    const data = await validation.getDataForUser(userId, category);
+    const data = await validation.getDataForUser(userId, category, sectionType);
     res.status(200).json(data);
   } catch (error) {
     res.status(500).json({ message: 'Error retrieving data', error: error.message });
   }
 };
 
-// Delete data entry
-exports.deleteData = async (req, res) => {
-  const { category, id } = req.params;
+
+// Final submission for multiple entries in a category (and optionally sectionType for multi-schema)
+exports.finalSubmit = async (req, res) => {
+  // Retrieve category and sectionType from req.params
+  const { category, sectionType } = req.params;
+  const { userId, data } = req.body;
 
   try {
-    await validation.deleteEntry(id, category);
+    // Find the category settings from categoryConfig
+    const categorySettings = categoryConfig.find(c => c.name === category);
+
+    // Check if it's a multi-sub-schema category and if sectionType is required
+    if (categorySettings.hasSubSchemas && !sectionType) {
+      throw new Error('Section type is required for multi-sub-schema categories');
+    }
+
+    // Call validation service to handle final submission for multi-schema or single-schema categories
+    const results = await validation.validateAndSaveData(userId, category, data, sectionType);
+    const successCount = results.filter((result) => result.success).length;
+    const failureCount = results.length - successCount;
+
+    // Respond with success message
+    res.status(200).json({
+      message: `Final submit successful. ${successCount} entries saved, ${failureCount} failures.`,
+    });
+  } catch (error) {
+    console.error('Error during final submit:', error);
+    res.status(500).json({ message: 'Error during final submit', error: error.message });
+  }
+};
+
+// Delete data entry
+exports.deleteData = async (req, res) => {
+  const { category, id, sectionType } = req.params;
+
+  try {
+    await validation.deleteEntry(id, category, sectionType);
     res.status(200).json({ message: 'Data deleted successfully' });
   } catch (error) {
     res.status(500).json({ message: 'Error deleting data', error: error.message });
   }
 };
-
-exports.finalSubmit = async (req, res) => {
-    const { userId, data, category } = req.body; // Ensure you're destructuring category from req.body
-
-    try {
-      if (!userId || !data || !category) {
-        throw new Error('User ID, data, and category are required.');
-      }
-
-      const results = await validation.validateAndSaveData(userId, category, data);
-      const successCount = results.filter((result) => result.success).length;
-      const failureCount = results.length - successCount;
-
-      res.status(200).json({
-        message: `Final submit successful. ${successCount} entries saved, ${failureCount} failures.`,
-      });
-    } catch (error) {
-      console.error('Error during final submit:', error);
-      res.status(500).json({ message: 'Error during final submit', error: error.message });
-    }
-  };
