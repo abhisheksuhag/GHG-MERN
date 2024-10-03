@@ -3,6 +3,7 @@ const cors = require('cors');
 require('dotenv').config();
 const connectDB = require('./config/db');
 const generalRoutes = require('./routes/generalRoutes'); // Generalized routes
+const calculatedDataRoutes = require('./routes/calculatedDataRoutes');
 
 const app = express();
 
@@ -22,6 +23,9 @@ app.use(express.json());
 
 // Register generalized routes
 app.use('/api', generalRoutes);
+
+// register generalized routes for calculated data
+app.use('/api/calculated', calculatedDataRoutes);
 
 const PORT = process.env.PORT || 3000;
 
